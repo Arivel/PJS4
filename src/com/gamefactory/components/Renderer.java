@@ -13,18 +13,31 @@ public class Renderer extends Component {
     private Position position;
     
     /**
+     * Collider à afficher (Rectangle)
+     */
+    private Collider collider;
+    
+    /**
      * Image affichée par le component
      */
     private BufferedImage image;
 
     @Override
-    public void init(ComponentManager owner) {
-        super.init(owner);
+    public void load() {
         position = (Position) owner.getComponent(Position.class);
+        try {
+        	collider = (Collider) owner.getComponent(Collider.class);
+        }
+        catch ( java.lang.IllegalStateException e) {
+        	//rien
+        }
     }
 
     public void render(Graphics g) {
         g.drawImage(image, (int) position.getX(), (int) position.getY(), null);
+        
+        if(collider != null)
+        	collider.render(g);
     }
 
     /**

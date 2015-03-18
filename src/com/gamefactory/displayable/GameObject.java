@@ -1,13 +1,10 @@
 package com.gamefactory.displayable;
 
 import com.gamefactory.game.Displayable;
-import com.gamefactory.utils.events.Event;
 import com.gamefactory.utils.events.Notifier;
-import com.gamefactory.utils.events.Observer;
-import com.gamefactory.utils.events.Subject;
+
 import java.awt.Graphics;
 import java.lang.reflect.InvocationTargetException;
-import java.util.EventObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,10 +17,10 @@ import java.util.logging.Logger;
  *
  * @since 1.0
  */
-public abstract class GameObject implements Displayable {
+public abstract class GameObject implements Displayable<Scene> {
 
     protected final Notifier notifier;
-    
+
     /**
      * Encapsulation de l'ensemble des components du Game Object
      *
@@ -41,8 +38,8 @@ public abstract class GameObject implements Displayable {
      * - Pascal Luttgens.
      */
     private boolean isActive;
-    
-    protected Scene scene;
+
+    protected Scene owner;
 
     public GameObject() {
         this.componentManager = new ComponentManager(this);
@@ -54,7 +51,7 @@ public abstract class GameObject implements Displayable {
     protected GameObject(String id) {
         this.componentManager = new ComponentManager(this);
         this.isActive = true;
-        this.id = id.toUpperCase();;
+        this.id = id.toUpperCase();
         this.notifier = new Notifier(this);
     }
 
@@ -67,39 +64,53 @@ public abstract class GameObject implements Displayable {
      *
      * - Pascal Luttgens.
      */
-    
     /**
      * Recupere l'id du GameObject
+     *
      * @return
      */
     public String getId() {
         return this.id;
     }
-    
+
     /**
      * Initialise la scene
+     *
      * @param scene
      */
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public void setOwner(Scene scene) {
+        this.owner = scene;
     }
-    
+
     /**
      * Recupere la scene
+     *
      * @return
      */
-    public Scene getScene() {
-        return this.scene;
+    public Scene getOwner() {
+        return this.owner;
     }
-    
+
     /**
-     * Recupere le ComponentManager encapsulant le 
-     * comportement des components au sein d'un GameObject
+     * Recupere le ComponentManager encapsulant le comportement des components
+     * au sein d'un GameObject
+     *
      * @return
      */
     public ComponentManager getComponentManager() {
         return this.componentManager;
     }
+
+    @Override
+    public void init(Scene owner) {
+        this.owner = owner;
+    }
+
+    @Override
+    public void load() {
+        
+    }
+    
     
     /**
      * Vérifie que le GameObject est actif avant de procéder à l'update.
@@ -146,12 +157,7 @@ public abstract class GameObject implements Displayable {
      * @param g
      */
     protected void renderObject(Graphics g) {
-        Component renderer = componentManager.getComponent("Renderer");
-        try {
-            renderer.getClass().getMethod("render", Graphics.class).invoke(renderer, g);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(GameObject.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Component renderer = componentManager.render(g);
     }
 
     /**
@@ -170,6 +176,10 @@ public abstract class GameObject implements Displayable {
      */
     public void disable() {
         this.isActive = false;
-    }    
-    
+    }
+
+    public boolean isInCameraField() {
+        return true;
+    }
+
 }

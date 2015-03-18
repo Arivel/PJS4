@@ -52,11 +52,6 @@ public class Position extends Component {
         this.orientation = Orientation.DOWN;
     }
 
-    @Override
-    public void init(ComponentManager owner) {
-        super.init(owner);
-    }
-
     /**
      * Recupere la valeur en abscisse
      * @return
@@ -91,7 +86,7 @@ public class Position extends Component {
 
     /**
      * Recupere la vitesse de deplacement du 
-     * personnage de haut en bas (abscisse x)
+     * GameObject de haut en bas (abscisse x)
      * @return
      */
     public float getxVelocity() {
@@ -100,7 +95,7 @@ public class Position extends Component {
 
     /**
      * Initialise la vitesse de deplacement du 
-     * personnage de haut en bas (abscisse x)
+     * GameObject de haut en bas (abscisse x)
      * @param xVelocity
      */
     public void setxVelocity(float xVelocity) {
@@ -109,7 +104,7 @@ public class Position extends Component {
 
     /**
      * Recupere la vitesse de deplacement du 
-     * personnage de gauche à droite (ordonnee y)
+     * GameObject de gauche ï¿½ droite (ordonnee y)
      * @return
      */
     public float getyVelocity() {
@@ -118,7 +113,7 @@ public class Position extends Component {
 
     /**
      * Initialise la vitesse de deplacement du 
-     * personnage de gauche à droite (ordonnee y)
+     * GameObject de gauche a droite (ordonnee y)
      * @param yVelocity
      */
     public void setyVelocity(float yVelocity) {
@@ -126,7 +121,7 @@ public class Position extends Component {
     }
 
     /**
-     * Recupere la hauteur du personnage
+     * Recupere la hauteur du GameObject
      * @return
      */
     public int getHeight() {
@@ -134,7 +129,7 @@ public class Position extends Component {
     }
     
     /**
-     * Initialise la taille du personnage
+     * Initialise la taille du GameObject
      * @param height
      */
     public void setHeight(int height) {
@@ -142,7 +137,7 @@ public class Position extends Component {
     }
 
     /**
-     * Recupere la largeur du personnage
+     * Recupere la largeur du GameObject
      * @return
      */
     public int getWidth() {
@@ -150,7 +145,7 @@ public class Position extends Component {
     }
 
     /**
-     * Initialise la largeur du personnage
+     * Initialise la largeur du GameObject
      * @param width
      */
     public void setWidth(int width) {
@@ -158,7 +153,7 @@ public class Position extends Component {
     }
 
     /**
-     * Recupere l'orientation du personnage
+     * Recupere l'orientation du GameObject
      * @return
      */
     public Orientation getOrientation() {
@@ -166,7 +161,7 @@ public class Position extends Component {
     }
 
     /**
-     * Initialise l'orientation du personnage
+     * Initialise l'orientation du GameObject
      * @param orientation
      */
     public void setOrientation(Orientation orientation) {
@@ -178,7 +173,7 @@ public class Position extends Component {
     }
 
     @Override
-    public void update() {
+    public void updateComponent() {
         this.x += (this.x + this.xVelocity > 0 && this.x + this.xVelocity < Game.WIDTH - this.width) ? this.xVelocity : 0;
         this.y += (this.y + this.yVelocity > 0 && this.y + this.yVelocity < Game.HEIGHT - this.height - Position.WINDOW_BORDER_SIZE) ? this.yVelocity : 0;
     }

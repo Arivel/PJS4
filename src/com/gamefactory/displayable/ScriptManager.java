@@ -1,17 +1,12 @@
 package com.gamefactory.displayable;
 
-import com.gamefactory.components.Renderer;
-import com.gamefactory.game.Displayable;
+import com.gamefactory.scripts.LoadingScript;
 import com.gamefactory.scripts.UpdateScript;
-import java.awt.Graphics;
-import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Le Component Manager encapsule le comportement des components au sein d'un
@@ -23,15 +18,13 @@ import java.util.logging.Logger;
  *
  * @since 1.0
  */
-public final class ComponentManager implements Displayable<GameObject>{
+public final class ScriptManager{
     
     private final GameObject owner;
-    private final List<Component> components;
     private final List<UpdateScript> scripts;
     
-    public ComponentManager(GameObject owner) {
+    public ScriptManager(GameObject owner) {
         this.owner = owner;
-        this.components = new ArrayList<>();
         this.scripts = new ArrayList<>();
     }
 
@@ -40,14 +33,13 @@ public final class ComponentManager implements Displayable<GameObject>{
      *
      * - Pascal Luttgens.
      *
-     * @param components Les components.
      * @param scripts    Les scripts.
      *
      * @since 1.0
      */
-    public void init(Component ... components) {
+    public void init(Script ... scripts) {
         
-        this.components.addAll(Arrays.asList(components));
+        this.scripts.addAll(Arrays.asList(components));
         
         this.components.sort(new Component.UpdatePriorityComparator());
         this.components.stream().forEach(c -> c.init(this));
@@ -58,14 +50,13 @@ public final class ComponentManager implements Displayable<GameObject>{
      * Initialise tous les components
      */
     public void load() {
-        this.components.stream().forEach(c -> c.load());
-        
+        this.scripts.stream().forEach(s -> s.execute());   
     }
     
     public void update() {
-        this.components.stream().map(c -> {
-            c.updateLogic();
-            return c;
+        this.scripts.stream().map(s -> {
+            s.updateLogic();
+            return s;
         }).forEach(c -> c.updateComponent());
     }
 
@@ -160,17 +151,6 @@ public final class ComponentManager implements Displayable<GameObject>{
     
     public GameObject getGameObject() {
         return owner;
-    }
-
-    @Override
-    public void render(Graphics g) {
-        Renderer renderer = (Renderer) getComponent("Renderer");
-        try {
-            renderer.getClass().getMethod("render", Graphics.class).invoke(renderer, g);
-
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(GameObject.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
 }

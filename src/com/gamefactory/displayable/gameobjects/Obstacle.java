@@ -5,18 +5,25 @@
  */
 package com.gamefactory.displayable.gameobjects;
 
+import com.gamefactory.components.Collider;
+import com.gamefactory.components.Position;
+import com.gamefactory.components.Renderer;
 import com.gamefactory.displayable.GameObject;
 
+/**
+ *
+ * @author scalpa
+ */
+public class Obstacle extends GameObject {
 
-public class EmptyGameObject extends GameObject {
-
-    public EmptyGameObject() {
+    public Obstacle() {
         super();
-        this.disable();
     }
 
     @Override
     public void load() {
+        this.componentManager.init(new Position(), new Renderer(), new Collider());
     }
-
+   
+    
 }
