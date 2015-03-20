@@ -5,8 +5,6 @@ import com.gamefactory.scripts.UpdateScript;
 import java.awt.Graphics;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 public final class ScriptManager <T extends Manager> implements Manager<T, Script>{
@@ -58,13 +56,10 @@ public final class ScriptManager <T extends Manager> implements Manager<T, Scrip
             }
         }
         this.scriptsU.stream().forEach(s -> s.init(this));
-        this.scriptsL.stream().forEach(s -> s.init(this));
     }
 
     @Override
     public void render(Graphics g) {
-        
-         
     }
 
     @Override
