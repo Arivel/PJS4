@@ -5,13 +5,13 @@
  */
 package com.gamefactory.scripts;
 
-import com.gamefactory.displayable.Manager;
+import com.gamefactory.game.Displayable;
 
 /**
  *
  * @param <T>
  */
-public abstract class UpdateScript<T extends Manager>  extends AbstractScript<T> {
+public abstract class UpdateScript<T extends Displayable>  extends AbstractScript<T> {
     
     
     
@@ -19,4 +19,7 @@ public abstract class UpdateScript<T extends Manager>  extends AbstractScript<T>
     public final boolean isConsumed() {
         return false;
     }
+    
+    
+    public abstract void execute();
 }

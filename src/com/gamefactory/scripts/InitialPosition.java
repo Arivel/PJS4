@@ -14,7 +14,7 @@ import static java.util.concurrent.ThreadLocalRandom.current;
  *
  * @author Adrien
  */
-public class InitialPosition extends LoadingScript {
+public class InitialPosition extends LoadingScript<Scene> {
 
 
     @Override
@@ -35,6 +35,10 @@ public class InitialPosition extends LoadingScript {
         Position p = (Position) this.owner.getOwner().getGameObjects().stream().filter(go -> go.getId().equals("HERO")).findFirst().get().getComponentManager().getComponent(Position.class);
         p.setX(200);
         p.setY(200);
+        
+        Position p1 = (Position) this.owner.getOwner().getGameObjects().stream().filter(go -> go.getId().equals("OBSTACLE")).findFirst().get().getComponentManager().getComponent(Position.class);
+        p1.setX(300);
+        p1.setY(300);
     }
 
 }

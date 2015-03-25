@@ -6,19 +6,10 @@
 package com.gamefactory.displayable;
 
 import com.gamefactory.callbacks.game.Callbacks;
-import com.gamefactory.listeners.ComponentListener;
-import com.gamefactory.scripts.LoadingScript;
-import com.gamefactory.scripts.UpdateScript;
 import com.gamefactory.utils.events.Notifier;
-import com.sun.org.apache.xml.internal.security.exceptions.AlgorithmAlreadyRegisteredException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  * Un component encapsule une fonctionalité d'un game object.
@@ -33,48 +24,30 @@ public abstract class Component implements Callbacks<ComponentManager>/**
  * implements Observer, Subject *
  */
 {
-    
+
     protected ComponentManager owner;
-    
+
     private final Notifier notifier;
-    
+
     private final List<Listener<Component, Void>> listeners;
-    
+
     public Component() {
         this.notifier = new Notifier(this);
         this.listeners = new ArrayList<>();
     }
 
-    public void addListeners(ComponentListener[] listeners) {
-        this.listeners.addAll(Arrays.asList(listeners));
-    }
-
-    
     @Override
     public final void init(ComponentManager cm) {
         this.owner = cm;
     }
-    
-    
-    public static final Component build(Class<? extends Component> clazz, Script<Component>[] scripts, ComponentListener[] listeners) {
-        Component c = null;
-        try {
-            c = clazz.newInstance();
-            if (listeners != null) {
-                c.addListeners(listeners);
-            }
-        } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Component.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return c;
+
+    @Override
+    public void load() {
+
     }
-    
-    public void updateLogic() {
-        
-    }
-    
-    public void updateComponent() {
-        
+
+    public void update() {
+
     }
 
     /**
@@ -103,7 +76,7 @@ public abstract class Component implements Callbacks<ComponentManager>/**
      * @since 1.0
      */
     public static class UpdatePriorityComparator implements Comparator<Component> {
-        
+
         @Override
         public int compare(Component c1, Component c2) {
             if (c1.getUpdatePriority() == c2.getUpdatePriority()) {
@@ -120,9 +93,9 @@ public abstract class Component implements Callbacks<ComponentManager>/**
     public Notifier getNotifier() {
         return this.notifier;
     }
-    
+
     public ComponentManager getComponentManager() {
         return this.owner;
     }
-    
+
 }
