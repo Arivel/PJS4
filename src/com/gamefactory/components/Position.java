@@ -1,8 +1,14 @@
 package com.gamefactory.components;
 
 import com.gamefactory.displayable.Component;
-import com.gamefactory.game.Game;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * Component permettant de gérer la position d'une unité et ses déplacements
@@ -27,11 +33,16 @@ public class Position extends Component {
 
     }
 
-    private float x;
-    private float y;
+    private int x;
+    private int y;
 
-    private float xVelocity;
-    private float yVelocity;
+    private int xVelocityDefault;
+    private int yVelocityDefault;
+
+    private HashMap<String, Integer> xVelocityModifiers;
+    private HashMap<String, Integer> yVelocityModifiers;
+
+    private ScheduledExecutorService ses = Executors.newScheduledThreadPool(10);
 
     private Orientation orientation;
 
@@ -41,8 +52,8 @@ public class Position extends Component {
     public Position() {
         this.x = 0;
         this.y = 520;
-        this.xVelocity = 0;
-        this.yVelocity = 0;
+        this.xVelocityModifiers = new HashMap<>();
+        this.yVelocityModifiers = new HashMap<>();
         this.height = 0;
         this.width = 0;
         this.orientation = Orientation.DOWN;
@@ -53,7 +64,7 @@ public class Position extends Component {
      *
      * @return
      */
-    public float getX() {
+    public int getX() {
         return x;
     }
 
@@ -62,7 +73,7 @@ public class Position extends Component {
      *
      * @param x
      */
-    public void setX(float x) {
+    public void setX(int x) {
         this.x = x;
     }
 
@@ -71,7 +82,7 @@ public class Position extends Component {
      *
      * @return
      */
-    public float getY() {
+    public int getY() {
         return y;
     }
 
@@ -80,8 +91,38 @@ public class Position extends Component {
      *
      * @param y
      */
-    public void setY(float y) {
+    public void setY(int y) {
         this.y = y;
+    }
+
+    public int getxVelocityDefault() {
+        return xVelocityDefault;
+    }
+
+    public void setxVelocityDefault(int xVelocityDefault) {
+        this.xVelocityDefault = xVelocityDefault;
+    }
+
+    public int getyVelocityDefault() {
+        return yVelocityDefault;
+    }
+
+    public void setyVelocityDefault(int yVelocityDefault) {
+        this.yVelocityDefault = yVelocityDefault;
+    }
+
+    public int getxVelocity() {
+        return getxVelocityDefault() != 0
+                ? getxVelocityDefault() + (getxVelocityDefault() > 0
+                        ? getxVelocityModifiers() : -getxVelocityModifiers()) : 0;
+
+    }
+
+    public int getyVelocity() {
+        return getyVelocityDefault() != 0
+                ? getyVelocityDefault() + (getyVelocityDefault() > 0
+                        ? getyVelocityModifiers() : -getyVelocityModifiers()) : 0;
+
     }
 
     /**
@@ -90,8 +131,8 @@ public class Position extends Component {
      *
      * @return
      */
-    public float getxVelocity() {
-        return xVelocity;
+    public Integer getxVelocityModifiers() {
+        return xVelocityModifiers.values().stream().reduce(Integer::sum).orElseGet(() -> 0);
     }
 
     /**
@@ -100,8 +141,22 @@ public class Position extends Component {
      *
      * @param xVelocity
      */
-    public void setxVelocity(float xVelocity) {
-        this.xVelocity = xVelocity;
+    public void setxVelocityModifiers(HashMap<String, Integer> xVelocityModifiers) {
+        this.xVelocityModifiers = xVelocityModifiers;
+    }
+
+    public void setxVelocityModifiers(String key, Integer xVelocityModifiers) {
+        this.xVelocityModifiers.clear();
+        this.xVelocityModifiers.put(key, xVelocityModifiers);
+    }
+
+    public void addxVelocityModifiers(String key, Integer velocity, Integer time) {
+        xVelocityModifiers.put(key, velocity);
+        if (time != null) {
+            ses.schedule(() -> {
+                xVelocityModifiers.remove(key);
+            }, time, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -110,8 +165,8 @@ public class Position extends Component {
      *
      * @return
      */
-    public float getyVelocity() {
-        return yVelocity;
+    public Integer getyVelocityModifiers() {
+        return yVelocityModifiers.values().stream().reduce(Integer::sum).orElseGet(() -> 0);
     }
 
     /**
@@ -120,8 +175,22 @@ public class Position extends Component {
      *
      * @param yVelocity
      */
-    public void setyVelocity(float yVelocity) {
-        this.yVelocity = yVelocity;
+    public void setyVelocityModifiers(HashMap<String, Integer> yVelocityModifiers) {
+        this.yVelocityModifiers = yVelocityModifiers;
+    }
+
+    public void setyVelocityModifiers(String key, Integer yVelocityModifiers) {
+        this.yVelocityModifiers.clear();
+        this.yVelocityModifiers.put(key, yVelocityModifiers);
+    }
+
+    public void addyVelocityModifiers(String key, Integer velocity, Integer time) {
+        yVelocityModifiers.put(key, velocity);
+        if (time != null) {
+            ses.schedule(() -> {
+                yVelocityModifiers.remove(key);
+            }, time, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -184,8 +253,8 @@ public class Position extends Component {
 
     @Override
     public void update() {
-        this.x += (this.x + this.xVelocity > 0 && this.x + this.xVelocity < this.owner.getScene().getLandscape().getWidth() - this.width) ? this.xVelocity : 0;
-        this.y += (this.y + this.yVelocity > 0 && this.y + this.yVelocity < this.owner.getScene().getLandscape().getHeight() - this.height - Position.WINDOW_BORDER_SIZE) ? this.yVelocity : 0;
+        this.x += (this.x + this.getxVelocity() > 0 && this.x + this.getxVelocity() < this.owner.getScene().getLandscape().getWidth() - this.width) ? this.getxVelocity() : 0;
+        this.y += (this.y + this.getyVelocity() > 0 && this.y + this.getyVelocity() < this.owner.getScene().getLandscape().getHeight() - this.height - Position.WINDOW_BORDER_SIZE) ? this.getyVelocity() : 0;
     }
 
     @Override
@@ -198,8 +267,8 @@ public class Position extends Component {
         ret.setX(this.x);
         ret.setY(this.y);
         ret.setOrientation(this.getOrientation());
-        ret.setxVelocity(this.xVelocity);
-        ret.setyVelocity(this.yVelocity);
+        ret.setxVelocityModifiers(this.xVelocityModifiers);
+        ret.setyVelocityModifiers(this.yVelocityModifiers);
         ret.setHeight(this.height);
         ret.setWidth(this.width);
         return ret;
@@ -207,14 +276,17 @@ public class Position extends Component {
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 43 * hash + Float.floatToIntBits(this.x);
-        hash = 43 * hash + Float.floatToIntBits(this.y);
-        hash = 43 * hash + Float.floatToIntBits(this.xVelocity);
-        hash = 43 * hash + Float.floatToIntBits(this.yVelocity);
-        hash = 43 * hash + Objects.hashCode(this.orientation);
-        hash = 43 * hash + this.height;
-        hash = 43 * hash + this.width;
+        int hash = 3;
+        hash = 79 * hash + this.x;
+        hash = 79 * hash + this.y;
+        hash = 79 * hash + this.xVelocityDefault;
+        hash = 79 * hash + this.yVelocityDefault;
+        hash = 79 * hash + Objects.hashCode(this.xVelocityModifiers);
+        hash = 79 * hash + Objects.hashCode(this.yVelocityModifiers);
+        hash = 79 * hash + Objects.hashCode(this.ses);
+        hash = 79 * hash + Objects.hashCode(this.orientation);
+        hash = 79 * hash + this.height;
+        hash = 79 * hash + this.width;
         return hash;
     }
 
@@ -227,16 +299,25 @@ public class Position extends Component {
             return false;
         }
         final Position other = (Position) obj;
-        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(other.x)) {
+        if (this.x != other.x) {
             return false;
         }
-        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(other.y)) {
+        if (this.y != other.y) {
             return false;
         }
-        if (Float.floatToIntBits(this.xVelocity) != Float.floatToIntBits(other.xVelocity)) {
+        if (this.xVelocityDefault != other.xVelocityDefault) {
             return false;
         }
-        if (Float.floatToIntBits(this.yVelocity) != Float.floatToIntBits(other.yVelocity)) {
+        if (this.yVelocityDefault != other.yVelocityDefault) {
+            return false;
+        }
+        if (!Objects.equals(this.xVelocityModifiers, other.xVelocityModifiers)) {
+            return false;
+        }
+        if (!Objects.equals(this.yVelocityModifiers, other.yVelocityModifiers)) {
+            return false;
+        }
+        if (!Objects.equals(this.ses, other.ses)) {
             return false;
         }
         if (this.orientation != other.orientation) {
@@ -250,5 +331,7 @@ public class Position extends Component {
         }
         return true;
     }
+
+   
 
 }

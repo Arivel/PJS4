@@ -5,19 +5,21 @@
  */
 package com.gamefactory.scripts;
 
-import com.gamefactory.displayable.Script;
+import com.gamefactory.utils.events.Event;
 
 /**
  *
- * @author scalpa
+ * @author ngo
  */
-public abstract class SceneScript implements Script {
-
+public class ListenerDamageScript extends ListenerScript {
     
-    @Override
-    public final boolean isConsumed() {
-        return false;
+    public void onEvent(Event e) {
+        
     }
 
+    @Override
+    public void load() {
+        
+    }
     
 }

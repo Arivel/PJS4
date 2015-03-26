@@ -20,15 +20,22 @@ import java.awt.event.KeyListener;
 public class PlayerInputHandler extends UpdateScript<ComponentManager> implements KeyListener {
 
     private final static int NB_KEYS = Short.MAX_VALUE;
-
+    private final static String VELOCITY_KEY = PlayerInputHandler.class.getSimpleName();
+    
     private Position position;
     private boolean[] keys;
+    private int velocity;
+
+    public void setVelocity(int velocity) {
+        this.velocity = velocity;
+    }
 
 
     @Override
     public void init(ScriptManager script) {
         super.init(script);
         this.keys = new boolean[NB_KEYS];
+        this.setVelocity(1);
         ServiceLocator.getGameWindow().getFrame().addKeyListener(this);
         ServiceLocator.getGameWindow().getCanvas().addKeyListener(this);
     }
@@ -76,34 +83,34 @@ public class PlayerInputHandler extends UpdateScript<ComponentManager> implement
     public void execute() {
         if (this.keys[KeyEvent.VK_LEFT]) {
             position.setOrientation(Position.Orientation.LEFT);
-            position.setxVelocity(-1f);
+            position.setxVelocityDefault(-velocity);
         } else {
             if (position.getxVelocity() < 0) {
-                position.setxVelocity(0);
+                position.setxVelocityDefault(0);
             }
         }
         if (this.keys[KeyEvent.VK_RIGHT]) {
             position.setOrientation(Position.Orientation.RIGHT);
-            position.setxVelocity(1f);
+            position.setxVelocityDefault(velocity);
         } else {
             if (position.getxVelocity() > 0) {
-                position.setxVelocity(0);
+                position.setxVelocityDefault(0);
             }
         }
         if (this.keys[KeyEvent.VK_UP]) {
             position.setOrientation(Position.Orientation.UP);
-            position.setyVelocity(-1f);
+            position.setyVelocityDefault(-velocity);
         } else {
             if (position.getyVelocity() < 0) {
-                position.setyVelocity(0);
+                position.setyVelocityDefault(0);
             }
         }
         if (this.keys[KeyEvent.VK_DOWN]) {
             position.setOrientation(Position.Orientation.DOWN);
-            position.setyVelocity(1f);
+            position.setyVelocityDefault(velocity);
         } else {
             if (position.getyVelocity() > 0) {
-                position.setyVelocity(0);
+                position.setyVelocityDefault(0);
             }
         }
     }
